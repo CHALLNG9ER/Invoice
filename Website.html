@@ -1,0 +1,202 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jewelry Invoice Generator</title>
+  <style>
+    :root {
+      --bg-light: #f9f9f9;
+      --bg-dark: #121212;
+      --text-light: #222;
+      --text-dark: #eee;
+      --primary: #4a90e2;
+      --accent: #f39c12;
+      --border-light: #ddd;
+      --border-dark: #444;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px 0;
+      font-size: 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+    }
+    body.dark input {
+      background-color: #222;
+      color: white;
+      border-color: var(--border-dark);
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #357abd;
+    }
+    .deleteBtn {
+      background: red;
+      color: white;
+    }
+    #darkModeToggle {
+      float: right;
+      margin-bottom: 10px;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid var(--border-light);
+      padding: 10px;
+      text-align: left;
+    }
+    body.dark th, body.dark td {
+      border-color: var(--border-dark);
+    }
+    th {
+      background: var(--primary);
+      color: white;
+    }
+    #totalAmount {
+      font-size: 1.2rem;
+      text-align: right;
+      margin-top: 10px;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <button id="darkModeToggle">Toggle Dark Mode</button>
+  <h2>Jewelry Invoice Generator</h2>  <div>
+    <label>Client Name: <input id="clientName" type="text"></label><br>
+    <label>Gmail: <input id="clientEmail" type="email"></label><br>
+    <label>Phone Number: <input id="clientPhone" type="text"></label><br>
+    <label>Date: <input id="invoiceDate" type="date"></label><br>
+  </div>  <h3>Add Item</h3>
+  <label>Description: <input id="desc" type="text"></label>
+  <label>Grams: <input id="grams" type="number"></label>
+  <label>Rate: <input id="rate" type="number"></label>
+  <label>Amount: <input id="amount" type="number"></label>
+  <button onclick="addItem()">Add Item</button>  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Grams</th>
+        <th>Rate</th>
+        <th>Amount</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="invoiceBody"></tbody>
+  </table>  <div id="totalAmount">Total: ₹0</div>
+  <button onclick="downloadPDF()">Download PDF</button>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
+    const body = document.body;
+    document.getElementById("darkModeToggle").onclick = () => body.classList.toggle("dark");
+
+    let total = 0;
+
+    function addItem() {
+      const desc = document.getElementById("desc").value;
+      const grams = document.getElementById("grams").value;
+      const rate = document.getElementById("rate").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+
+      if (!desc || isNaN(amount)) return alert("Please enter valid item and amount");
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${desc}</td>
+        <td>${grams}</td>
+        <td>${rate}</td>
+        <td>₹${amount.toFixed(2)}</td>
+        <td><button class="deleteBtn" onclick="deleteRow(this, ${amount})">Delete</button></td>
+      `;
+      document.getElementById("invoiceBody").appendChild(row);
+
+      total += amount;
+      updateTotal();
+
+      // Clear inputs
+      document.getElementById("desc").value = "";
+      document.getElementById("grams").value = "";
+      document.getElementById("rate").value = "";
+      document.getElementById("amount").value = "";
+    }
+
+    function deleteRow(btn, amt) {
+      btn.parentElement.parentElement.remove();
+      total -= amt;
+      updateTotal();
+    }
+
+    function updateTotal() {
+      document.getElementById("totalAmount").innerText = `Total: ₹${total.toFixed(2)}`;
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const centerX = pageWidth / 2;
+
+      let y = 10;
+      doc.setFontSize(18);
+      doc.text("Jewelry Invoice", centerX, y, { align: "center" });
+      y += 10;
+
+      const name = document.getElementById("clientName").value;
+      const email = document.getElementById("clientEmail").value;
+      const phone = document.getElementById("clientPhone").value;
+      const date = document.getElementById("invoiceDate").value;
+
+      doc.setFontSize(12);
+      doc.text(`Name: ${name}`, 10, y); y += 6;
+      doc.text(`Email: ${email}`, 10, y); y += 6;
+      doc.text(`Phone: ${phone}`, 10, y); y += 6;
+      doc.text(`Date: ${date}`, 10, y); y += 10;
+
+      doc.setFontSize(11);
+      doc.setFont(undefined, "bold");
+      doc.text("Description", 10, y);
+      doc.text("Grams", 60, y);
+      doc.text("Rate", 100, y);
+      doc.text("Amount", 150, y);
+      y += 7;
+
+      doc.setFont(undefined, "normal");
+      document.querySelectorAll("#invoiceBody tr").forEach(row => {
+        const cells = row.querySelectorAll("td");
+        doc.text(cells[0].innerText, 10, y);
+        doc.text(cells[1].innerText, 60, y);
+        doc.text(cells[2].innerText, 100, y);
+        doc.text(cells[3].innerText, 150, y);
+        y += 7;
+      });
+
+      y += 5;
+      doc.setFontSize(13);
+      doc.setFont(undefined, "bold");
+      doc.text(`Total: ₹${total.toFixed(2)}`, 150, y);
+
+      doc.save("invoice.pdf");
+    }
+  </script></body>
+</html>
