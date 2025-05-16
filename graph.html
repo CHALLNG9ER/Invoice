@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gold & Silver Tracker - Khushi Jewellers</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    h1 {
+      color: #b4883b;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
+    #goldRateDisplay, #silverRateDisplay {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+    canvas {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 30px;
+    }
+    .menu {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    #rateInputSection {
+      display: none;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu" onclick="promptPassword()">&#x22EE;</div>
+  <h1>Khushi Jewellers - Live Metal Rates</h1>
+
+  <div id="rateInputSection">
+    <label for="goldRate">Gold Rate (₹/gram):</label>
+    <input type="number" id="goldRate" />
+    <label for="silverRate">Silver Rate (₹/gram):</label>
+    <input type="number" id="silverRate" />
+    <button onclick="submitRates()">Submit</button>
+  </div>
+
+  <div id="goldRateDisplay">Current Gold Rate: ₹--</div>
+  <canvas id="goldChart" height="150"></canvas>
+
+  <div id="silverRateDisplay">Current Silver Rate: ₹--</div>
+  <canvas id="silverChart" height="150"></canvas>
+
+  <script>
+    const goldData = JSON.parse(localStorage.getItem('goldRateHistory')) || [];
+    const silverData = JSON.parse(localStorage.getItem('silverRateHistory')) || [];
+
+    const goldLabels = goldData.map(entry => entry.time);
+    const goldPrices = goldData.map(entry => entry.price);
+
+    const silverLabels = silverData.map(entry => entry.time);
+    const silverPrices = silverData.map(entry => entry.price);
+
+    const goldCtx = document.getElementById('goldChart').getContext('2d');
+    const silverCtx = document.getElementById('silverChart').getContext('2d');
+
+    const goldChart = new Chart(goldCtx, {
+      type: 'line',
+      data: {
+        labels: goldLabels,
+        datasets: [{
+          label: 'Gold Rate (₹/gram)',
+          data: goldPrices,
+          borderColor: '#FFD700',
+          backgroundColor: 'rgba(255, 215, 0, 0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        plugins: { legend: { display: true } },
+        scales: {
+          x: { display: true, title: { display: true, text: 'Time' } },
+          y: { display: true, title: { display: true, text: '₹/gram' } }
+        }
+      }
+    });
+
+    const silverChart = new Chart(silverCtx, {
+      type: 'line',
+      data: {
+        labels: silverLabels,
+        datasets: [{
+          label: 'Silver Rate (₹/gram)',
+          data: silverPrices,
+          borderColor: '#C0C0C0',
+          backgroundColor: 'rgba(192, 192, 192, 0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        plugins: { legend: { display: true } },
+        scales: {
+          x: { display: true, title: { display: true, text: 'Time' } },
+          y: { display: true, title: { display: true, text: '₹/gram' } }
+        }
+      }
+    });
+
+    if (goldPrices.length > 0) {
+      document.getElementById('goldRateDisplay').innerText = `Current Gold Rate: ₹${goldPrices[goldPrices.length - 1].toFixed(2)}`;
+    }
+
+    if (silverPrices.length > 0) {
+      document.getElementById('silverRateDisplay').innerText = `Current Silver Rate: ₹${silverPrices[silverPrices.length - 1].toFixed(2)}`;
+    }
+
+    function promptPassword() {
+      const pwd = prompt("Enter password to edit rates:");
+      if (pwd === '9839') {
+        document.getElementById('rateInputSection').style.display = 'block';
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+
+    function submitRates() {
+      const goldRate = parseFloat(document.getElementById('goldRate').value);
+      const silverRate = parseFloat(document.getElementById('silverRate').value);
+      const now = new Date().toLocaleTimeString();
+
+      if (goldRate > 0) {
+        goldData.push({ time: now, price: goldRate });
+        localStorage.setItem('goldRateHistory', JSON.stringify(goldData));
+      }
+
+      if (silverRate > 0) {
+        silverData.push({ time: now, price: silverRate });
+        localStorage.setItem('silverRateHistory', JSON.stringify(silverData));
+      }
+
+      location.reload(); // refresh and return to normal view
+    }
+  </script>
+</body>
+</html>

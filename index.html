@@ -1,8 +1,9 @@
+
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Khushi Jewellers Invoice</title>
+  <title>Khushi Jewellers</title>
   <style>
     :root {
       --bg-light: #fdfcfb;
@@ -20,228 +21,87 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg-light);
       color: var(--text-light);
-      padding: 20px;
+      margin: 0;
       transition: background 0.3s, color 0.3s;
     }
     body.dark {
       background-color: var(--bg-dark);
       color: var(--text-dark);
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: var(--card);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    }
-    body.dark .container {
-      background: var(--card-dark);
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px 0;
-      font-size: 1rem;
-      border: 1px solid var(--border-light);
-      border-radius: 6px;
-    }
-    body.dark input {
-      background-color: #333;
-      color: white;
-      border-color: var(--border-dark);
-    }
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #ba4a00;
-    }
-    .deleteBtn {
-      background: #c0392b;
-    }
-    #darkModeToggle {
-      float: right;
-      margin-bottom: 10px;
-      background: transparent;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-    }
-    h2, h3 {
-      color: var(--primary);
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      border: 1px solid var(--border-light);
-      padding: 10px;
-      text-align: left;
-    }
-    body.dark th, body.dark td {
-      border-color: var(--border-dark);
-    }
-    th {
-      background: var(--primary);
-      color: white;
-    }
-    #totalAmount {
-      font-size: 1.3rem;
-      text-align: right;
-      margin-top: 15px;
-      color: var(--accent);
-      font-weight: bold;
-    }
-    .row {
+    header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: var(--primary);
+      color: white;
     }
-    .row label {
-      flex: 1;
-      min-width: 140px;
+    header h1 {
+      margin: 0;
+    }
+    .menu {
+      position: relative;
+    }
+    .menu-btn {
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: white;
+    }
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      color: black;
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    .dropdown a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: black;
+    }
+    .dropdown a:hover {
+      background-color: #f1f1f1;
+    }
+    .container {
+      padding: 20px;
+    }
+    iframe {
+      width: 100%;
+      height: 80vh;
+      border: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <button id="darkModeToggle">Toggle Dark Mode</button>
-    <h2>Khushi Jewellers</h2><div class="row">
-  <label>Client Name: <input id="clientName" type="text"></label>
-  <label>Gmail: <input id="clientEmail" type="email"></label>
-  <label>Phone Number: <input id="clientPhone" type="text"></label>
-  <label>Date: <input id="invoiceDate" type="date"></label>
-</div>
-
-<h3>Add Item</h3>
-<div class="row">
-  <label>Description: <input id="desc" type="text"></label>
-  <label>Grams: <input id="grams" type="number"></label>
-  <label>Rate: <input id="rate" type="number"></label>
-  <label>Amount (₹): <input id="amount" type="number"></label>
-</div>
-<button onclick="addItem()">Add Item</button>
-
-<table>
-  <thead>
-    <tr>
-      <th>Description</th>
-      <th>Grams</th>
-      <th>Rate</th>
-      <th>Amount (₹)</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="invoiceBody"></tbody>
-</table>
-
-<div id="totalAmount">Total: ₹0</div>
-<button onclick="downloadPDF()">Download PDF</button>
-
-  </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
-    const body = document.body;
-    document.getElementById("darkModeToggle").onclick = () => body.classList.toggle("dark");
-
-    let total = 0;
-
-    function addItem() {
-      const desc = document.getElementById("desc").value;
-      const grams = document.getElementById("grams").value;
-      const rate = document.getElementById("rate").value;
-      const amount = parseFloat(document.getElementById("amount").value);
-
-      if (!desc || isNaN(amount)) return alert("Please enter valid item and amount");
-
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${desc}</td>
-        <td>${grams}</td>
-        <td>₹${rate}</td>
-        <td>₹${amount.toFixed(2)}</td>
-        <td><button class="deleteBtn" onclick="deleteRow(this, ${amount})">Delete</button></td>
-      `;
-      document.getElementById("invoiceBody").appendChild(row);
-
-      total += amount;
-      updateTotal();
-
-      document.getElementById("desc").value = "";
-      document.getElementById("grams").value = "";
-      document.getElementById("rate").value = "";
-      document.getElementById("amount").value = "";
+  <header>
+    <h1>Khushi Jewellers</h1>
+    <div class="menu">
+      <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+      <div class="dropdown" id="menuDropdown">
+        <a href="invoice.html">Invoice</a>
+      </div>
+    </div>
+  </header>  <div class="container">
+    <iframe src="graph.html" title="Live Rates Graph"></iframe>
+  </div>  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("menuDropdown");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
     }
-
-    function deleteRow(btn, amt) {
-      btn.parentElement.parentElement.remove();
-      total -= amt;
-      updateTotal();
-    }
-
-    function updateTotal() {
-      document.getElementById("totalAmount").innerText = `Total: ₹${total.toFixed(2)}`;
-    }
-
-    function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const centerX = pageWidth / 2;
-      let y = 10;
-
-      doc.setFontSize(20);
-      doc.setTextColor(211, 84, 0);
-      doc.text("Khushi Jewellers", centerX, y, { align: "center" });
-      y += 10;
-
-      const name = document.getElementById("clientName").value;
-      const email = document.getElementById("clientEmail").value;
-      const phone = document.getElementById("clientPhone").value;
-      const date = document.getElementById("invoiceDate").value;
-
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(12);
-      doc.text(`Name: ${name}`, 10, y); y += 6;
-      doc.text(`Email: ${email}`, 10, y); y += 6;
-      doc.text(`Phone: ${phone}`, 10, y); y += 6;
-      doc.text(`Date: ${date}`, 10, y); y += 10;
-
-      doc.setDrawColor(211, 84, 0);
-      doc.setFillColor(211, 84, 0);
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11);
-      doc.setFont(undefined, "bold");
-      doc.rect(10, y - 6, 190, 8, 'F');
-      doc.text("Description", 12, y);
-      doc.text("Grams", 62, y);
-      doc.text("Rate", 102, y);
-      doc.text("Amount (₹)", 152, y);
-      y += 8;
-
-      doc.setFont(undefined, "normal");
-      doc.setTextColor(0, 0, 0);
-      document.querySelectorAll("#invoiceBody tr").forEach(row => {
-        const cells = row.querySelectorAll("td");
-        doc.text(cells[0].innerText, 12, y);
-        doc.text(cells[1].innerText, 62, y);
-        doc.text(cells[2].innerText, 102, y);
-        doc.text(cells[3].innerText, 152, y);
-        y += 7;
-      });
-
-      y += 5;
-      doc.setFontSize(13);
-      doc.setFont(undefined, "bold");
-      doc.setTextColor(39, 174, 96);
-      doc.text(`Total: ₹${total.toFixed(2)}`, 150, y);
-
-      doc.save("Khushi_Invoice.pdf");
+    window.onclick = function(e) {
+      if (!e.target.matches('.menu-btn')) {
+        const menu = document.getElementById("menuDropdown");
+        if (menu.style.display === 'block') {
+          menu.style.display = 'none';
+        }
+      }
     }
   </script></body>
 </html>
