@@ -2,20 +2,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jewelry Invoice Generator</title>
+  <title>Khushi Jewellers Invoice</title>
   <style>
     :root {
-      --bg-light: #f9f9f9;
-      --bg-dark: #121212;
-      --text-light: #222;
-      --text-dark: #eee;
-      --primary: #4a90e2;
-      --accent: #f39c12;
-      --border-light: #ddd;
-      --border-dark: #444;
+      --bg-light: #fdfcfb;
+      --bg-dark: #1a1a1a;
+      --text-light: #2d3436;
+      --text-dark: #dfe6e9;
+      --primary: #d35400;
+      --accent: #27ae60;
+      --card: #ffffff;
+      --card-dark: #2d2d2d;
+      --border-light: #dcdde1;
+      --border-dark: #636e72;
     }
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg-light);
       color: var(--text-light);
       padding: 20px;
@@ -25,15 +27,26 @@
       background-color: var(--bg-dark);
       color: var(--text-dark);
     }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--card);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    body.dark .container {
+      background: var(--card-dark);
+    }
     input, button {
-      padding: 8px;
+      padding: 10px;
       margin: 5px 0;
       font-size: 1rem;
       border: 1px solid var(--border-light);
-      border-radius: 4px;
+      border-radius: 6px;
     }
     body.dark input {
-      background-color: #222;
+      background-color: #333;
       color: white;
       border-color: var(--border-dark);
     }
@@ -42,13 +55,13 @@
       color: white;
       border: none;
       cursor: pointer;
+      transition: 0.3s;
     }
     button:hover {
-      background: #357abd;
+      background: #ba4a00;
     }
     .deleteBtn {
-      background: red;
-      color: white;
+      background: #c0392b;
     }
     #darkModeToggle {
       float: right;
@@ -56,6 +69,10 @@
       background: transparent;
       color: var(--primary);
       border: 2px solid var(--primary);
+    }
+    h2, h3 {
+      color: var(--primary);
+      text-align: center;
     }
     table {
       width: 100%;
@@ -75,38 +92,59 @@
       color: white;
     }
     #totalAmount {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       text-align: right;
-      margin-top: 10px;
+      margin-top: 15px;
       color: var(--accent);
+      font-weight: bold;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .row label {
+      flex: 1;
+      min-width: 140px;
     }
   </style>
 </head>
 <body>
-  <button id="darkModeToggle">Toggle Dark Mode</button>
-  <h2>Jewelry Invoice Generator</h2>  <div>
-    <label>Client Name: <input id="clientName" type="text"></label><br>
-    <label>Gmail: <input id="clientEmail" type="email"></label><br>
-    <label>Phone Number: <input id="clientPhone" type="text"></label><br>
-    <label>Date: <input id="invoiceDate" type="date"></label><br>
-  </div>  <h3>Add Item</h3>
+  <div class="container">
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <h2>Khushi Jewellers</h2><div class="row">
+  <label>Client Name: <input id="clientName" type="text"></label>
+  <label>Gmail: <input id="clientEmail" type="email"></label>
+  <label>Phone Number: <input id="clientPhone" type="text"></label>
+  <label>Date: <input id="invoiceDate" type="date"></label>
+</div>
+
+<h3>Add Item</h3>
+<div class="row">
   <label>Description: <input id="desc" type="text"></label>
   <label>Grams: <input id="grams" type="number"></label>
   <label>Rate: <input id="rate" type="number"></label>
-  <label>Amount: <input id="amount" type="number"></label>
-  <button onclick="addItem()">Add Item</button>  <table>
-    <thead>
-      <tr>
-        <th>Description</th>
-        <th>Grams</th>
-        <th>Rate</th>
-        <th>Amount</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="invoiceBody"></tbody>
-  </table>  <div id="totalAmount">Total: ₹0</div>
-  <button onclick="downloadPDF()">Download PDF</button>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
+  <label>Amount (₹): <input id="amount" type="number"></label>
+</div>
+<button onclick="addItem()">Add Item</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Grams</th>
+      <th>Rate</th>
+      <th>Amount (₹)</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="invoiceBody"></tbody>
+</table>
+
+<div id="totalAmount">Total: ₹0</div>
+<button onclick="downloadPDF()">Download PDF</button>
+
+  </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
     const body = document.body;
     document.getElementById("darkModeToggle").onclick = () => body.classList.toggle("dark");
 
@@ -124,7 +162,7 @@
       row.innerHTML = `
         <td>${desc}</td>
         <td>${grams}</td>
-        <td>${rate}</td>
+        <td>₹${rate}</td>
         <td>₹${amount.toFixed(2)}</td>
         <td><button class="deleteBtn" onclick="deleteRow(this, ${amount})">Delete</button></td>
       `;
@@ -133,7 +171,6 @@
       total += amount;
       updateTotal();
 
-      // Clear inputs
       document.getElementById("desc").value = "";
       document.getElementById("grams").value = "";
       document.getElementById("rate").value = "";
@@ -156,10 +193,11 @@
 
       const pageWidth = doc.internal.pageSize.getWidth();
       const centerX = pageWidth / 2;
-
       let y = 10;
-      doc.setFontSize(18);
-      doc.text("Jewelry Invoice", centerX, y, { align: "center" });
+
+      doc.setFontSize(20);
+      doc.setTextColor(211, 84, 0);
+      doc.text("Khushi Jewellers", centerX, y, { align: "center" });
       y += 10;
 
       const name = document.getElementById("clientName").value;
@@ -167,36 +205,43 @@
       const phone = document.getElementById("clientPhone").value;
       const date = document.getElementById("invoiceDate").value;
 
+      doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
       doc.text(`Name: ${name}`, 10, y); y += 6;
       doc.text(`Email: ${email}`, 10, y); y += 6;
       doc.text(`Phone: ${phone}`, 10, y); y += 6;
       doc.text(`Date: ${date}`, 10, y); y += 10;
 
+      doc.setDrawColor(211, 84, 0);
+      doc.setFillColor(211, 84, 0);
+      doc.setTextColor(255, 255, 255);
       doc.setFontSize(11);
       doc.setFont(undefined, "bold");
-      doc.text("Description", 10, y);
-      doc.text("Grams", 60, y);
-      doc.text("Rate", 100, y);
-      doc.text("Amount", 150, y);
-      y += 7;
+      doc.rect(10, y - 6, 190, 8, 'F');
+      doc.text("Description", 12, y);
+      doc.text("Grams", 62, y);
+      doc.text("Rate", 102, y);
+      doc.text("Amount (₹)", 152, y);
+      y += 8;
 
       doc.setFont(undefined, "normal");
+      doc.setTextColor(0, 0, 0);
       document.querySelectorAll("#invoiceBody tr").forEach(row => {
         const cells = row.querySelectorAll("td");
-        doc.text(cells[0].innerText, 10, y);
-        doc.text(cells[1].innerText, 60, y);
-        doc.text(cells[2].innerText, 100, y);
-        doc.text(cells[3].innerText, 150, y);
+        doc.text(cells[0].innerText, 12, y);
+        doc.text(cells[1].innerText, 62, y);
+        doc.text(cells[2].innerText, 102, y);
+        doc.text(cells[3].innerText, 152, y);
         y += 7;
       });
 
       y += 5;
       doc.setFontSize(13);
       doc.setFont(undefined, "bold");
+      doc.setTextColor(39, 174, 96);
       doc.text(`Total: ₹${total.toFixed(2)}`, 150, y);
 
-      doc.save("invoice.pdf");
+      doc.save("Khushi_Invoice.pdf");
     }
   </script></body>
 </html>
