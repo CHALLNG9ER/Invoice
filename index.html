@@ -1,107 +1,159 @@
-
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Khushi Jewellers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg-light: #fdfcfb;
-      --bg-dark: #1a1a1a;
-      --text-light: #2d3436;
-      --text-dark: #dfe6e9;
-      --primary: #d35400;
-      --accent: #27ae60;
-      --card: #ffffff;
-      --card-dark: #2d2d2d;
-      --border-light: #dcdde1;
-      --border-dark: #636e72;
-    }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-light);
-      color: var(--text-light);
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff5f5;
+      color: #660000;
       margin: 0;
-      transition: background 0.3s, color 0.3s;
-    }
-    body.dark {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
+      padding: 0;
+      line-height: 1.7;
+      scroll-behavior: smooth;
     }
     header {
+      position: sticky;
+      top: 0;
+      background-color: #cc0000;
+      color: white;
+      padding: 0.5rem 1rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 6px rgba(204, 0, 0, 0.4);
+      z-index: 1000;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
-      background-color: var(--primary);
+    }
+    nav {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    nav a, nav button {
+      background-color: transparent;
       color: white;
-    }
-    header h1 {
-      margin: 0;
-    }
-    .menu {
-      position: relative;
-    }
-    .menu-btn {
-      font-size: 24px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: white;
-    }
-    .dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      background-color: white;
-      color: black;
-      border: 1px solid var(--border-light);
-      border-radius: 5px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      z-index: 10;
-    }
-    .dropdown a {
-      display: block;
-      padding: 10px 20px;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid white;
+      border-radius: 4px;
+      font-size: 0.9rem;
       text-decoration: none;
-      color: black;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
-    .dropdown a:hover {
-      background-color: #f1f1f1;
+    nav a:hover, nav button:hover {
+      background-color: white;
+      color: #cc0000;
     }
-    .container {
-      padding: 20px;
+    main {
+      max-width: 900px;
+      margin: 2rem auto 4rem auto;
+      padding: 0 1rem;
     }
-    iframe {
-      width: 100%;
-      height: 80vh;
-      border: none;
+    section {
+      background-color: #ffe6e6;
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(204, 0, 0, 0.1);
+    }
+    h2 {
+      color: #990000;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      border-bottom: 3px solid #cc0000;
+      padding-bottom: 0.3rem;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    footer {
+      background-color: #330000;
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      user-select: none;
+    }
+    footer p {
+      margin: 0.3rem 0;
+    }
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+      nav {
+        justify-content: flex-start;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Khushi Jewellers</h1>
-    <div class="menu">
-      <button class="menu-btn" onclick="toggleMenu()">⋮</button>
-      <div class="dropdown" id="menuDropdown">
-        <a href="invoice.html">Invoice</a>
-      </div>
-    </div>
-  </header>  <div class="container">
-    <iframe src="graph.html" title="Live Rates Graph"></iframe>
-  </div>  <script>
-    function toggleMenu() {
-      const menu = document.getElementById("menuDropdown");
-      menu.style.display = menu.style.display === "block" ? "none" : "block";
+<header>
+  <span>Khushi Jewellers</span>
+  <nav>
+    <a href="#gold-section">Gold</a>
+    <a href="#silver-section">Silver</a>
+    <a href="#jewellery-section">Jewellery</a>
+    <a href="#density-section">Density</a>
+    <button onclick="authenticate('inventory.html')">Inventory</button>
+    <button onclick="authenticate('invoice.html')">Invoice</button>
+  </nav>
+</header>
+<main>
+  <section id="gold-section">
+    <h2>Gold (सोना)</h2>
+    <p>Gold is a precious yellow metal known for its beauty, rarity, and high value. It has been used for centuries in coins, jewelry, and as a symbol of wealth. Gold is soft, malleable, and resistant to tarnishing, making it perfect for ornaments.</p>
+    <p>सोना एक कीमती पीली धातु है जिसे सुंदरता, दुर्लभता और उच्च मूल्य के लिए जाना जाता है। इसका उपयोग सदियों से सिक्कों, आभूषणों और धन के प्रतीक के रूप में किया गया है। यह मुलायम होता है, आसानी से आकार लेता है और जल्दी खराब नहीं होता।</p>
+    <p>Pure gold is 24 karats. However, for jewelry, 22k and 18k are more common, mixed with other metals for strength. India is one of the largest consumers of gold in the world, especially during weddings and festivals.</p>
+    <p>शुद्ध सोना 24 कैरेट का होता है, लेकिन आभूषणों के लिए आमतौर पर 22 या 18 कैरेट का उपयोग किया जाता है, जिसमें अन्य धातुओं को मजबूती के लिए मिलाया जाता है। भारत दुनिया के सबसे बड़े सोने के उपभोक्ताओं में से एक है।</p>
+  </section>  <section id="silver-section">
+    <h2>Silver (चांदी)</h2>
+    <p>Silver is a lustrous white metal with high conductivity. It's used in jewelry, utensils, coins, electronics, and industrial applications. It's more abundant than gold but still considered valuable.</p>
+    <p>चांदी एक चमकदार सफेद धातु है जिसमें विद्युत और ऊष्मा के प्रवाह की उच्च क्षमता होती है। इसका उपयोग आभूषणों, बर्तनों, सिक्कों और इलेक्ट्रॉनिक उपकरणों में किया जाता है। यह सोने से अधिक मात्रा में मिलती है लेकिन फिर भी मूल्यवान मानी जाती है।</p>
+    <p>Silver tarnishes over time due to reaction with air, but polishing restores its shine. Sterling silver, which contains 92.5% pure silver, is common in fine jewelry.</p>
+    <p>चांदी समय के साथ काली पड़ सकती है, लेकिन पॉलिशिंग से इसे फिर से चमकाया जा सकता है। स्टर्लिंग चांदी, जिसमें 92.5% शुद्ध चांदी होती है, आभूषणों में आम है।</p>
+  </section>  <section id="jewellery-section">
+    <h2>Jewellery (आभूषण)</h2>
+    <p>Jewellery refers to ornaments like necklaces, rings, earrings, bangles, and more made using precious metals and stones. In Indian culture, jewellery holds deep emotional and cultural significance.</p>
+    <p>आभूषण वे सजावटी वस्तुएं हैं जैसे हार, अंगूठी, झुमके और चूड़ियाँ, जिन्हें कीमती धातुओं और रत्नों से बनाया जाता है। भारतीय संस्कृति में आभूषणों का विशेष स्थान और भावनात्मक महत्व है।</p>
+    <p>Jewellery is also a form of investment, especially gold. It is passed down generations and worn during festivals, marriages, and religious events.</p>
+    <p>सोने के आभूषणों को निवेश के रूप में भी देखा जाता है। इन्हें पीढ़ियों तक संरक्षित रखा जाता है और खास अवसरों पर पहना जाता है।</p>
+  </section>  <section id="density-section">
+    <h2>Density (घनत्व)</h2>
+    <p><strong>Density of Gold:</strong> 19.32 grams per cubic centimeter. Gold is one of the densest metals. This makes even small gold items feel heavy.</p>
+    <p><strong>सोने का घनत्व:</strong> 19.32 ग्राम प्रति घन सेंटीमीटर। सोना सबसे भारी धातुओं में से एक है, इसलिए इसका छोटा टुकड़ा भी भारी महसूस होता है।</p>
+    <p><strong>Density of Silver:</strong> 10.49 grams per cubic centimeter. Silver is lighter than gold, which reflects in the feel and design of silver jewelry.</p>
+    <p><strong>चांदी का घनत्व:</strong> 10.49 ग्राम प्रति घन सेंटीमीटर। यह सोने से हल्की होती है, जिससे इसके आभूषण अधिक हल्के लगते हैं।</p>
+  </section>
+</main>
+<footer>
+  <p><strong>Khushi Jewellers Pvt. Ltd.</strong></p>
+  <p>All rights reserved. This site is protected and monitored for privacy and security.</p>
+  <p>Unauthorized access to inventory or invoices is prohibited. Password access required.</p>
+  <p>© 2025 Khushi Jewellers. Secure & Trusted Since 1999.</p>
+</footer>
+<script>
+  function authenticate(page) {
+    const password = prompt("Please enter the password:");
+    if (password === "9839") {
+      window.location.href = page;
+    } else {
+      alert("Incorrect password. Access denied.");
     }
-    window.onclick = function(e) {
-      if (!e.target.matches('.menu-btn')) {
-        const menu = document.getElementById("menuDropdown");
-        if (menu.style.display === 'block') {
-          menu.style.display = 'none';
-        }
-      }
-    }
-  </script></body>
+  }
+</script>
+</body>
 </html>

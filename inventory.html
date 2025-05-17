@@ -1,0 +1,157 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #fff5f5;
+      color: #400000;
+    }
+    h2 {
+      color: #b30000;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ffcccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #ff9999;
+    }
+    input, select, button {
+      margin: 5px 5px 5px 0;
+      padding: 6px;
+      border: 1px solid #ff6666;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #ff4d4d;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e60000;
+    }
+    #searchInput {
+      margin-top: 20px;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ff9999;
+    }
+  </style>
+</head>
+<body>
+  <h2>Inventory & Item Management</h2>  <form id="itemForm">
+    <input type="hidden" id="editIndex" value="-1">
+    <input type="text" id="itemName" placeholder="Item Name" required>
+    <input type="text" id="category" placeholder="Category" required>
+    <input type="number" step="0.01" id="weight" placeholder="Weight (g)" required>
+    <input type="text" id="purity" placeholder="Purity (e.g. 22K)" required>
+    <input type="number" step="0.01" id="makingCharge" placeholder="Making Charge (₹)" required>
+    <input type="number" id="quantity" placeholder="Quantity" required>
+    <button type="submit">Save Item</button>
+  </form>  <input type="text" id="searchInput" placeholder="Search by item name or category...">  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Weight</th>
+        <th>Purity</th>
+        <th>Making Charge</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="inventoryTable"></tbody>
+  </table>  <script>
+    const form = document.getElementById("itemForm");
+    const table = document.getElementById("inventoryTable");
+    const searchInput = document.getElementById("searchInput");
+
+    function loadInventory(filter = "") {
+      const inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
+      table.innerHTML = "";
+      inventory.forEach((item, index) => {
+        const itemText = `${item.name.toLowerCase()} ${item.category.toLowerCase()}`;
+        if (!itemText.includes(filter.toLowerCase())) return;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.category}</td>
+          <td>${item.weight}</td>
+          <td>${item.purity}</td>
+          <td>${item.makingCharge}</td>
+          <td>${item.quantity}</td>
+          <td>
+            <button onclick="editItem(${index})">Edit</button>
+            <button onclick="deleteItem(${index})">Delete</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    function saveInventory(inventory) {
+      localStorage.setItem("inventory", JSON.stringify(inventory));
+      loadInventory(searchInput.value);
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
+
+      const item = {
+        name: document.getElementById("itemName").value,
+        category: document.getElementById("category").value,
+        weight: parseFloat(document.getElementById("weight").value),
+        purity: document.getElementById("purity").value,
+        makingCharge: parseFloat(document.getElementById("makingCharge").value),
+        quantity: parseInt(document.getElementById("quantity").value)
+      };
+
+      const editIndex = document.getElementById("editIndex").value;
+      if (editIndex >= 0) {
+        inventory[editIndex] = item;
+        document.getElementById("editIndex").value = -1;
+      } else {
+        inventory.push(item);
+      }
+
+      saveInventory(inventory);
+      form.reset();
+    });
+
+    function editItem(index) {
+      const inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
+      const item = inventory[index];
+      document.getElementById("itemName").value = item.name;
+      document.getElementById("category").value = item.category;
+      document.getElementById("weight").value = item.weight;
+      document.getElementById("purity").value = item.purity;
+      document.getElementById("makingCharge").value = item.makingCharge;
+      document.getElementById("quantity").value = item.quantity;
+      document.getElementById("editIndex").value = index;
+    }
+
+    function deleteItem(index) {
+      const inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
+      inventory.splice(index, 1);
+      saveInventory(inventory);
+    }
+
+    searchInput.addEventListener("input", () => {
+      loadInventory(searchInput.value);
+    });
+
+    loadInventory();
+  </script></body>
+</html>
