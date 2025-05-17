@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gold & Silver Tracker - Khushi Jewellers</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -61,15 +63,28 @@
   <div id="silverRateDisplay">Current Silver Rate: ₹--</div>
   <canvas id="silverChart" height="150"></canvas>
 
-  <script>
-    const goldData = JSON.parse(localStorage.getItem('goldRateHistory')) || [];
-    const silverData = JSON.parse(localStorage.getItem('silverRateHistory')) || [];
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    const goldLabels = goldData.map(entry => entry.time);
-    const goldPrices = goldData.map(entry => entry.price);
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjy6Jp6RozryS6iL3wuiEZuBjeEdQWYnQ",
+      authDomain: "invoice-d4b59.firebaseapp.com",
+      projectId: "invoice-d4b59",
+      storageBucket: "invoice-d4b59.appspot.com",
+      messagingSenderId: "513449855362",
+      appId: "1:513449855362:web:a4f48e5c47465404f5279b",
+      databaseURL: "https://invoice-d4b59-default-rtdb.firebaseio.com"
+    };
 
-    const silverLabels = silverData.map(entry => entry.time);
-    const silverPrices = silverData.map(entry => entry.price);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const goldRef = ref(db, 'goldRates');
+    const silverRef = ref(db, 'silverRates');
+
+    const goldData = [];
+    const silverData = [];
 
     const goldCtx = document.getElementById('goldChart').getContext('2d');
     const silverCtx = document.getElementById('silverChart').getContext('2d');
@@ -77,10 +92,10 @@
     const goldChart = new Chart(goldCtx, {
       type: 'line',
       data: {
-        labels: goldLabels,
+        labels: [],
         datasets: [{
           label: 'Gold Rate (₹/gram)',
-          data: goldPrices,
+          data: [],
           borderColor: '#FFD700',
           backgroundColor: 'rgba(255, 215, 0, 0.2)',
           fill: true,
@@ -99,10 +114,10 @@
     const silverChart = new Chart(silverCtx, {
       type: 'line',
       data: {
-        labels: silverLabels,
+        labels: [],
         datasets: [{
           label: 'Silver Rate (₹/gram)',
-          data: silverPrices,
+          data: [],
           borderColor: '#C0C0C0',
           backgroundColor: 'rgba(192, 192, 192, 0.2)',
           fill: true,
@@ -118,40 +133,60 @@
       }
     });
 
-    if (goldPrices.length > 0) {
-      document.getElementById('goldRateDisplay').innerText = `Current Gold Rate: ₹${goldPrices[goldPrices.length - 1].toFixed(2)}`;
+    onValue(goldRef, (snapshot) => {
+      goldData.length = 0;
+      snapshot.forEach(child => goldData.push(child.val()));
+      updateGoldChart();
+    });
+
+    onValue(silverRef, (snapshot) => {
+      silverData.length = 0;
+      snapshot.forEach(child => silverData.push(child.val()));
+      updateSilverChart();
+    });
+
+    function updateGoldChart() {
+      const labels = goldData.map(d => d.time);
+      const prices = goldData.map(d => d.price);
+      goldChart.data.labels = labels;
+      goldChart.data.datasets[0].data = prices;
+      goldChart.update();
+      if (prices.length > 0) {
+        document.getElementById('goldRateDisplay').innerText = `Current Gold Rate: ₹${prices[prices.length - 1].toFixed(2)}`;
+      }
     }
 
-    if (silverPrices.length > 0) {
-      document.getElementById('silverRateDisplay').innerText = `Current Silver Rate: ₹${silverPrices[silverPrices.length - 1].toFixed(2)}`;
+    function updateSilverChart() {
+      const labels = silverData.map(d => d.time);
+      const prices = silverData.map(d => d.price);
+      silverChart.data.labels = labels;
+      silverChart.data.datasets[0].data = prices;
+      silverChart.update();
+      if (prices.length > 0) {
+        document.getElementById('silverRateDisplay').innerText = `Current Silver Rate: ₹${prices[prices.length - 1].toFixed(2)}`;
+      }
     }
 
-    function promptPassword() {
+    window.promptPassword = function () {
       const pwd = prompt("Enter password to edit rates:");
       if (pwd === '9839') {
         document.getElementById('rateInputSection').style.display = 'block';
       } else {
         alert("Incorrect password.");
       }
-    }
+    };
 
-    function submitRates() {
+    window.submitRates = function () {
       const goldRate = parseFloat(document.getElementById('goldRate').value);
       const silverRate = parseFloat(document.getElementById('silverRate').value);
       const now = new Date().toLocaleTimeString();
 
-      if (goldRate > 0) {
-        goldData.push({ time: now, price: goldRate });
-        localStorage.setItem('goldRateHistory', JSON.stringify(goldData));
-      }
+      if (goldRate > 0) push(goldRef, { time: now, price: goldRate });
+      if (silverRate > 0) push(silverRef, { time: now, price: silverRate });
 
-      if (silverRate > 0) {
-        silverData.push({ time: now, price: silverRate });
-        localStorage.setItem('silverRateHistory', JSON.stringify(silverData));
-      }
-
-      location.reload(); // refresh and return to normal view
-    }
+      document.getElementById('goldRate').value = '';
+      document.getElementById('silverRate').value = '';
+    };
   </script>
 </body>
 </html>
