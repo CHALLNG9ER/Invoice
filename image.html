@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jewellery Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Lightbox2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/css/lightbox.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fff8f8;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 20px;
+      font-size: 2rem;
+      color: #b30000;
+      border-bottom: 2px solid #b30000;
+    }
+
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .gallery a {
+      width: 100%;
+      display: block;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border: 3px solid #b30000;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.015);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Jewellery Collection</h1>
+
+  <div class="gallery">
+    <a href="1.jpg" data-lightbox="jewels"><img src="1.jpg" alt="Jewellery 1" /></a>
+    <a href="2.jpg" data-lightbox="jewels"><img src="2.jpg" alt="Jewellery 2" /></a>
+    <a href="3.jpg" data-lightbox="jewels"><img src="3.jpg" alt="Jewellery 3" /></a>
+    <a href="4.jpg" data-lightbox="jewels"><img src="4.jpg" alt="Jewellery 4" /></a>
+    <a href="5.jpg" data-lightbox="jewels"><img src="5.jpg" alt="Jewellery 5" /></a>
+    <a href="6.jpg" data-lightbox="jewels"><img src="6.jpg" alt="Jewellery 6" /></a>
+    <a href="7.jpg" data-lightbox="jewels"><img src="7.jpg" alt="Jewellery 7" /></a>
+    <a href="8.jpg" data-lightbox="jewels"><img src="8.jpg" alt="Jewellery 8" /></a>
+    <a href="9.jpg" data-lightbox="jewels"><img src="9.jpg" alt="Jewellery 9" /></a>
+    <a href="10.jpg" data-lightbox="jewels"><img src="10.jpg" alt="Jewellery 10" /></a>
+    <a href="11.jpg" data-lightbox="jewels"><img src="11.jpg" alt="Jewellery 11" /></a>
+    <a href="13.jpg" data-lightbox="jewels"><img src="13.jpg" alt="Jewellery 13" /></a>
+  </div>
+
+  <!-- Lightbox2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/js/lightbox.min.js"></script>
+</body>
+</html>
