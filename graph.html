@@ -8,9 +8,138 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+  <!-- Firebase SDK (v10+) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjy6Jp6RozryS6iL3wuiEZuBjeEdQWYnQ",
+      authDomain: "invoice-d4b59.firebaseapp.com",
+      databaseURL: "https://invoice-d4b59-default-rtdb.firebaseio.com",
+      projectId: "invoice-d4b59",
+      storageBucket: "invoice-d4b59.appspot.com",
+      messagingSenderId: "513449855362",
+      appId: "1:513449855362:web:a4f48e5c47465404f5279b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const goldRef = ref(db, 'goldRates');
+    const silverRef = ref(db, 'silverRates');
+
+    const goldData = [];
+    const silverData = [];
+
+    const goldCtx = document.getElementById('goldChart').getContext('2d');
+    const silverCtx = document.getElementById('silverChart').getContext('2d');
+
+    const goldChart = new Chart(goldCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Gold Rate (₹/gram)',
+          data: [],
+          borderColor: '#FFD700',
+          backgroundColor: 'rgba(255, 215, 0, 0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        plugins: { legend: { display: true } },
+        scales: {
+          x: { display: true, title: { display: true, text: 'Time' } },
+          y: { display: true, title: { display: true, text: '₹/gram' } }
+        }
+      }
+    });
+
+    const silverChart = new Chart(silverCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Silver Rate (₹/gram)',
+          data: [],
+          borderColor: '#C0C0C0',
+          backgroundColor: 'rgba(192, 192, 192, 0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        plugins: { legend: { display: true } },
+        scales: {
+          x: { display: true, title: { display: true, text: 'Time' } },
+          y: { display: true, title: { display: true, text: '₹/gram' } }
+        }
+      }
+    });
+
+    onValue(goldRef, (snapshot) => {
+      goldData.length = 0;
+      snapshot.forEach(child => goldData.push(child.val()));
+      updateGoldChart();
+    });
+
+    onValue(silverRef, (snapshot) => {
+      silverData.length = 0;
+      snapshot.forEach(child => silverData.push(child.val()));
+      updateSilverChart();
+    });
+
+    function updateGoldChart() {
+      const labels = goldData.map(d => d.time);
+      const prices = goldData.map(d => d.price);
+      goldChart.data.labels = labels;
+      goldChart.data.datasets[0].data = prices;
+      goldChart.update();
+      if (prices.length > 0) {
+        document.getElementById('goldRateDisplay').innerText = `Current Gold Rate: ₹${prices[prices.length - 1].toFixed(2)}`;
+      }
+    }
+
+    function updateSilverChart() {
+      const labels = silverData.map(d => d.time);
+      const prices = silverData.map(d => d.price);
+      silverChart.data.labels = labels;
+      silverChart.data.datasets[0].data = prices;
+      silverChart.update();
+      if (prices.length > 0) {
+        document.getElementById('silverRateDisplay').innerText = `Current Silver Rate: ₹${prices[prices.length - 1].toFixed(2)}`;
+      }
+    }
+
+    // Expose to global scope
+    window.promptPassword = function () {
+      const pwd = prompt("Enter password to edit rates:");
+      if (pwd === '9839') {
+        document.getElementById('rateInputSection').style.display = 'block';
+      } else {
+        alert("Incorrect password.");
+      }
+    };
+
+    window.submitRates = function () {
+      const goldRate = parseFloat(document.getElementById('goldRate').value);
+      const silverRate = parseFloat(document.getElementById('silverRate').value);
+      const now = new Date().toLocaleTimeString();
+
+      if (goldRate > 0) push(goldRef, { time: now, price: goldRate });
+      if (silverRate > 0) push(silverRef, { time: now, price: silverRate });
+
+      document.getElementById('goldRate').value = '';
+      document.getElementById('silverRate').value = '';
+    };
+
+    // 3-dot menu fix
+    document.getElementById('menuButton').addEventListener('click', () => {
+      promptPassword();
+    });
+  </script>
 
   <style>
     body {
@@ -49,7 +178,7 @@
   </style>
 </head>
 <body>
-  <div class="menu" onclick="promptPassword()">&#x22EE;</div>
+  <div class="menu" id="menuButton">&#x22EE;</div>
   <h1>Khushi Jewellers - Live Metal Rates</h1>
 
   <div id="rateInputSection">
@@ -65,132 +194,5 @@
 
   <div id="silverRateDisplay">Current Silver Rate: ₹--</div>
   <canvas id="silverChart" height="150"></canvas>
-
-  <script>
-    
-  // Firebase v10 - Load without modules
-  const firebaseConfig = {
-    apiKey: "AIzaSyAjy6Jp6RozryS6iL3wuiEZuBjeEdQWYnQ",
-    authDomain: "invoice-d4b59.firebaseapp.com",
-    databaseURL: "https://invoice-d4b59-default-rtdb.firebaseio.com",
-    projectId: "invoice-d4b59",
-    storageBucket: "invoice-d4b59.appspot.com",
-    messagingSenderId: "513449855362",
-    appId: "1:513449855362:web:a4f48e5c47465404f5279b"
-  };
-
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  const goldRef = db.ref("goldRates");
-  const silverRef = db.ref("silverRates");
-
-  const goldData = [];
-  const silverData = [];
-
-  const goldCtx = document.getElementById('goldChart').getContext('2d');
-  const silverCtx = document.getElementById('silverChart').getContext('2d');
-
-  const goldChart = new Chart(goldCtx, {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Gold Rate (₹/gram)',
-        data: [],
-        borderColor: '#FFD700',
-        backgroundColor: 'rgba(255, 215, 0, 0.2)',
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      plugins: { legend: { display: true } },
-      scales: {
-        x: { display: true, title: { display: true, text: 'Time' } },
-        y: { display: true, title: { display: true, text: '₹/gram' } }
-      }
-    }
-  });
-
-  const silverChart = new Chart(silverCtx, {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Silver Rate (₹/gram)',
-        data: [],
-        borderColor: '#C0C0C0',
-        backgroundColor: 'rgba(192, 192, 192, 0.2)',
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      plugins: { legend: { display: true } },
-      scales: {
-        x: { display: true, title: { display: true, text: 'Time' } },
-        y: { display: true, title: { display: true, text: '₹/gram' } }
-      }
-    }
-  });
-
-  goldRef.on("value", (snapshot) => {
-    goldData.length = 0;
-    snapshot.forEach(child => goldData.push(child.val()));
-    updateGoldChart();
-  });
-
-  silverRef.on("value", (snapshot) => {
-    silverData.length = 0;
-    snapshot.forEach(child => silverData.push(child.val()));
-    updateSilverChart();
-  });
-
-  function updateGoldChart() {
-    const labels = goldData.map(d => d.time);
-    const prices = goldData.map(d => d.price);
-    goldChart.data.labels = labels;
-    goldChart.data.datasets[0].data = prices;
-    goldChart.update();
-    if (prices.length > 0) {
-      document.getElementById('goldRateDisplay').innerText = `Current Gold Rate: ₹${prices[prices.length - 1].toFixed(2)}`;
-    }
-  }
-
-  function updateSilverChart() {
-    const labels = silverData.map(d => d.time);
-    const prices = silverData.map(d => d.price);
-    silverChart.data.labels = labels;
-    silverChart.data.datasets[0].data = prices;
-    silverChart.update();
-    if (prices.length > 0) {
-      document.getElementById('silverRateDisplay').innerText = `Current Silver Rate: ₹${prices[prices.length - 1].toFixed(2)}`;
-    }
-  }
-
-  window.promptPassword = function () {
-    const pwd = prompt("Enter password to edit rates:");
-    if (pwd === '9839') {
-      document.getElementById('rateInputSection').style.display = 'block';
-    } else {
-      alert("Incorrect password.");
-    }
-  };
-
-  window.submitRates = function () {
-    const goldRate = parseFloat(document.getElementById('goldRate').value);
-    const silverRate = parseFloat(document.getElementById('silverRate').value);
-    const now = new Date().toLocaleTimeString();
-
-    if (goldRate > 0) goldRef.push({ time: now, price: goldRate });
-    if (silverRate > 0) silverRef.push({ time: now, price: silverRate });
-
-    document.getElementById('goldRate').value = '';
-    document.getElementById('silverRate').value = '';
-  };
-
-  </script>
 </body>
 </html>
